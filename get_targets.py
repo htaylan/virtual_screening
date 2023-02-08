@@ -1,8 +1,13 @@
+import pandas as pd
 from chembl_webresource_client.new_client import new_client
 
-class getChemBl:
+
+class ChemBLClient:
     def __init__(self):
-        self.new_client = Client(config.CHEMBL_API_KEY)
+        self.target = new_client.target
+        self.activity = new_client.activity
+        self.targets = None
+        self.selected_target = None
 
     def get_targets(self, target_name):
         """
@@ -10,25 +15,26 @@ class getChemBl:
         :return: This function gets targets from ChemBL database
         and return as a dataframe
         """
-        target = self.new_client.target
-        target_query = target.search(target_name)
-        targets = pd.DataFrame.from_dict(target_query)
-        return targets
+        target_query = self.target.search(target_name)
+        self.targets = pd.DataFrame.from_dict(target_query)
+        return self.targets
 
     def select_target(self, n):
         """
         :return: Selects the target
         """
-        selected_target = self.targets.target_chembl_id[n]
-        return selected_target
+        self.selected_target = self.targets.target_chembl_id[n]
+        return self.selected_target
 
-    def get_inhibitors(self, selected_target):
+    def get_inhibitors(self, selected_target=None):
         """
         :param selected_target: ChemBl Id of selected target
         :return: The inhibitors for selected target
         from ChemBl database as a dataframe
         """
-        activity = self.new_client.activity
-        res = activity.filter(target_chembl_id=selected_target)
+        if not selected_target:
+            selected_target = self.selected_target
+        res = self.activity.filter(target_chembl_id=selected_target)
         df = pd.DataFrame.from_dict(res)
         return df
+
