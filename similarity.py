@@ -3,19 +3,24 @@ from rdkit.Chem import MurckoScaffold
 from rdkit.Chem.rdmolops import SanitizeFlags
 from rdkit import DataStructs
 
-class MoleculeAnalyzer:
-    def __init__(self, df, n, verbose=False):
+from rdkit import Chem
+from rdkit.Chem import MurckoScaffold
+from rdkit.Chem.Fingerprints import FingerprintMols
+from rdkit import DataStructs
+
+class SimilarityScore:
+    def __init__(self, df, smiles, n, verbose=False):
         self.df = df
+        self.smiles = smiles
         self.n = n
         self.verbose = verbose
     
-    def get_scaffold(self, smiles):
+    def get_scaffold(self):
         """
-        :param smiles: The smiles string of the molecules
         :return: The Murckoscaffold of a molecule
         """
         scaffold = []
-        for smile in smiles:
+        for smile in self.smiles:
             mol = Chem.MolFromSmiles(smile)
             core = MurckoScaffold.GetScaffoldForMol(mol)
             scaffold.append(Chem.MolToSmiles(core, isomericSmiles=True))
@@ -29,7 +34,7 @@ class MoleculeAnalyzer:
         min_idx = self.df['standard_value'].idxmin()
         return min_idx
 
-    def get_min_std_val_smiles(self, min_idx):
+    def get_min_std_val_smiles(self,min_idx):
         """
         :param min_idx: the ID of the molecule with the lowest standard value
         :return: The smiles of the molecule with the lowest standard value
@@ -39,7 +44,6 @@ class MoleculeAnalyzer:
 
     def calc_Tanimoto_sim(self, min_sml):
         """
-        :param min_sml: The smiles of the molecule with the lowest standard value
         :return: Return the list of Tanimoto similarity values compared to
         reference molecule
         """
@@ -65,8 +69,11 @@ class MoleculeAnalyzer:
             mol = self.df['canonical_smiles'][i]
             smiles_n.append(mol)
         return smiles_n
-      
-    def add_H_to_smiles(self):
-        mols = [Chem.MolFromSmiles(smi) for smi in self.smile_list]
+
+    def add_H_to_smiles(self, smile_list):
+        """
+        :return: Return the objects of the molecules with H
+        """
+        mols = [Chem.MolFromSmiles(smi) for smi in smile_list]
         mols_addH = [Chem.AddHs(mol) for mol in mols]
         return mols_addH
