@@ -1,10 +1,7 @@
 import rdkit.Chem as Chem
-from rdkit.Chem import MurckoScaffold
+from rdkit.Chem.Scaffolds import MurckoScaffold
 from rdkit.Chem.rdmolops import SanitizeFlags
 from rdkit import DataStructs
-
-from rdkit import Chem
-from rdkit.Chem import MurckoScaffold
 from rdkit.Chem.Fingerprints import FingerprintMols
 from rdkit import DataStructs
 
@@ -77,3 +74,4 @@ class SimilarityScore:
         mols = [Chem.MolFromSmiles(smi) for smi in smile_list]
         mols_addH = [Chem.AddHs(mol) for mol in mols]
         return mols_addH
+
